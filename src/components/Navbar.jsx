@@ -56,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
       color: "cyan",
     },
   },
+  active: {
+    color: "cyan",
+  },
 }));
 
 export default function Navbar() {
@@ -94,7 +97,11 @@ export default function Navbar() {
             </Typography>
           </Link>
 
-          <NavLink className={classes.navLink} to="/watch-later">
+          <NavLink
+            activeClassName={classes.active}
+            className={classes.navLink}
+            to="/watch-later"
+          >
             Watch Later
           </NavLink>
 

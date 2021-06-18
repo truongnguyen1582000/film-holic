@@ -12,6 +12,7 @@ import { Avatar } from "@material-ui/core";
 import { useSnackbar } from "notistack";
 import axiosClient from "api/axiosClient";
 import StorageKeys from "constants/storage-keys";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,29 +52,38 @@ const useStyles = makeStyles((theme) => ({
 function FilmItem({ filmItem }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const { id: account_id } = JSON.parse(localStorage.getItem(StorageKeys.USER));
-  const ssid = localStorage.getItem(StorageKeys.SESSION_ID);
+  const user = useSelector((state) => state.user.current);
+  const isLoggedIn = !!user.id;
 
   const handleWatchLaterClick = () => {
     // https://api.themoviedb.org/3/account/ai/watchlist?api_key=ac8dbe6b737a115059f9681b7c2a0575&session_id=ssid
     const addToWatchLater = async () => {
+      if (!isLoggedIn) {
+        enqueueSnackbar("Please login first !", { variant: "info" });
+
+        return;
+      }
+
+      const { id: account_id } = JSON.parse(
+        localStorage.getItem(StorageKeys.USER)
+      );
+      const ssid = localStorage.getItem(StorageKeys.SESSION_ID);
       try {
         await axiosClient.post(
-          `${commonKeys.STATIC_HOST}/account/${account_id}/watchlist?api_key=${commonKeys.API_KEY}&session_id=${ssid}`,
+          `/account/${account_id}/watchlist?api_key=${commonKeys.API_KEY}&session_id=${ssid}`,
           {
             media_type: "movie",
             media_id: filmItem.id,
             watchlist: true,
           }
         );
+        enqueueSnackbar("Add watch later success", { variant: "success" });
       } catch (err) {
         enqueueSnackbar("Add watch later fail.", { variant: "error" });
       }
     };
 
     addToWatchLater();
-
-    enqueueSnackbar("Add watch later success", { variant: "success" });
   };
 
   return (
