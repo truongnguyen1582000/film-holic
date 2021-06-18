@@ -1,6 +1,7 @@
 import { Menu, MenuItem } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
+import { cyan } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import IconButton from "@material-ui/core/IconButton";
@@ -14,7 +15,7 @@ import Login from "features/Auth/components/Login";
 import { logout } from "features/Auth/userSlice";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -44,6 +45,16 @@ const useStyles = makeStyles((theme) => ({
   accountItem: {
     fontSize: "40px",
     color: "#fff",
+  },
+  navLink: {
+    textDecoration: "none",
+    textTransform: "uppercase",
+    color: "white",
+    fontSize: 16,
+
+    "&:hover": {
+      color: "cyan",
+    },
   },
 }));
 
@@ -82,6 +93,10 @@ export default function Navbar() {
               HOLIC FILM
             </Typography>
           </Link>
+
+          <NavLink className={classes.navLink} to="/watch-later">
+            Watch Later
+          </NavLink>
 
           {isLoggedIn ? (
             <IconButton onClick={handleClick}>

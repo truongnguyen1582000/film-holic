@@ -9,7 +9,9 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import commonKeys from "constants/common-keys";
 import { Avatar } from "@material-ui/core";
-import { deepOrange } from "@material-ui/core/colors";
+import { useSnackbar } from "notistack";
+import axiosClient from "api/axiosClient";
+import StorageKeys from "constants/storage-keys";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +50,32 @@ const useStyles = makeStyles((theme) => ({
 
 function FilmItem({ filmItem }) {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const { id: account_id } = JSON.parse(localStorage.getItem(StorageKeys.USER));
+  const ssid = localStorage.getItem(StorageKeys.SESSION_ID);
+
+  const handleWatchLaterClick = () => {
+    // https://api.themoviedb.org/3/account/ai/watchlist?api_key=ac8dbe6b737a115059f9681b7c2a0575&session_id=ssid
+    const addToWatchLater = async () => {
+      try {
+        await axiosClient.post(
+          `${commonKeys.STATIC_HOST}/account/${account_id}/watchlist?api_key=${commonKeys.API_KEY}&session_id=${ssid}`,
+          {
+            media_type: "movie",
+            media_id: filmItem.id,
+            watchlist: true,
+          }
+        );
+      } catch (err) {
+        enqueueSnackbar("Add watch later fail.", { variant: "error" });
+      }
+    };
+
+    addToWatchLater();
+
+    enqueueSnackbar("Add watch later success", { variant: "success" });
+  };
+
   return (
     <Card className={classes.root}>
       <Avatar className={`${classes.orange} ${classes.rate}`}>
@@ -79,8 +107,13 @@ function FilmItem({ filmItem }) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary">
-          Share
+        <Button
+          onClick={handleWatchLaterClick}
+          size="medium"
+          variant="contained"
+          color="primary"
+        >
+          Watch Later
         </Button>
         <Button size="small" color="primary">
           Learn More
